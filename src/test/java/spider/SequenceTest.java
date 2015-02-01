@@ -1,12 +1,15 @@
 package spider;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.spider.lambda.Sequence;
+import org.spider.lambda.tuple.Tuple;
 
 public class SequenceTest {
 
@@ -24,6 +27,22 @@ public class SequenceTest {
         Sequence<Integer> seq2 = Sequence.ofType(list.stream(), Integer.class);
         int sum = seq2.foldLeft(0, (x,y) -> x +y);
         Assert.assertTrue(sum==15);
+
+        testfoldRight();
+
+    }
+    @Test
+    public void testfoldRight() {
+        ArrayList<String> list2 = new ArrayList<>();
+        list2.add("A");
+        list2.add("m");
+        list2.add("i");
+        list2.add("t");
+        System.out.println(list2);
+        Sequence<String> seq3 = Sequence.sequence(list2);
+        String name = seq3.foldLeft("s", (x,y) -> x+y);
+        System.out.println(name);
+        Assert.assertTrue(name.equals("Amit"));
     }
 
     @Test
@@ -35,6 +54,10 @@ public class SequenceTest {
         seq = Sequence.cycle(Stream.of(1,2,3));
         String join = seq.limit(10).join();
         Assert.assertTrue(join.length() > 9);
+
+
+        Sequence seq3 = Sequence.unfold(20, i -> i >= 6 ? Optional.of(Tuple.tuple(i, i - 1)) : Optional.empty());
+        seq3.forEach(i -> System.out.print(i));
     }
 
 }

@@ -62,49 +62,19 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return Sequence.concat(new Stream[] { this, other });
     }
 
-    /**
-     * Concatenate two streams.
-     * Sequence.of(1, 2, 3).concat(4)
-     * will give a sequence of (1, 2, 3, 4)
-     */
     default Sequence<T> concat(T other) {
         return concat(Sequence.of(other));
     }
 
-    /**
-     * Concatenate two streams.
-     * Sequence.of(1, 2, 3).concat(4, 5, 6) will\
-     *give // (1, 2, 3, 4, 5, 6)
-     */
     @SuppressWarnings({ "unchecked" })
     default Sequence<T> concat(T... other) {
         return concat(Sequence.of(other));
     }
 
-    /**
-     * Repeat a stream infinitely.
-     * <p>
-     * <code><pre>
-     * // (1, 2, 3, 1, 2, 3, ...)
-     * Seq.of(1, 2, 3).cycle();
-     * </pre></code>
-     *
-     * @see #cycle(Stream)
-     */
     default Sequence<T> cycle() {
         return cycle(this);
     }
 
-    /**
-     * Zip two streams into one.
-     * <p>
-     * <code><pre>
-     * // (tuple(1, "a"), tuple(2, "b"), tuple(3, "c"))
-     * Seq.of(1, 2, 3).zip(Seq.of("a", "b", "c"))
-     * </pre></code>
-     *
-     * @see #zip(Stream, Stream)
-     */
     default <U> Sequence<Tuple2<T, U>> zip(Sequence<U> other) {
         return zip(this, other);
     }
@@ -208,7 +178,8 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
     }
 
     default int length() {
-        return foldLeft(0, (n, ignored) -> n + 1);
+        int length = foldLeft(0, (n, ignored) -> n + 1);
+        return length;
     }
 
 
@@ -524,7 +495,7 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
      * <p>
      * <code><pre>
      * // (tuple(1, "a"), tuple(2, "b"), tuple(3, "c"))
-     * Seq.of(1, 2, 3).zip(Seq.of("a", "b", "c"))
+     * Sequence.of(1, 2, 3).zip(Sequence.of("a", "b", "c"))
      * </pre></code>
      */
     static <T1, T2> Sequence<Tuple2<T1, T2>> zip(Stream<T1> left, Stream<T2> right) {
@@ -592,14 +563,7 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return sequence(stream).reverse().foldLeft(seed, (u, t) -> function.apply(t, u));
     }
 
-    /**
-     * Unfold a function into a stream.
-     * <p>
-     * <code><pre>
-     * // (1, 2, 3, 4, 5)
-     * Seq.unfold(1, i -> i <= 6 ? Optional.of(tuple(i, i + 1)) : Optional.empty())
-     * </pre></code>
-     */
+
     static <T, U> Sequence<T> unfold(U seed, Function<U, Optional<Tuple2<T, U>>> unfolder) {
         class Unfold implements Iterator<T> {
             U u;
@@ -637,42 +601,17 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return sequence(new Unfold(seed));
     }
 
-    /**
-     * Reverse a stream.
-     * <p>
-     * <code><pre>
-     * // (3, 2, 1)
-     * Seq.of(1, 2, 3).reverse()
-     * </pre></code>
-     */
     static <T> Sequence<T> reverse(Stream<T> stream) {
         List<T> list = toList(stream);
         Collections.reverse(list);
         return sequence(list);
     }
-
-    /**
-     * Shuffle a stream
-     * <p>
-     * <code><pre>
-     * // e.g. (2, 3, 1)
-     * Seq.of(1, 2, 3).shuffle()
-     * </pre></code>
-     */
     static <T> Sequence<T> shuffle(Stream<T> stream) {
         List<T> list = toList(stream);
         Collections.shuffle(list);
         return sequence(list);
     }
 
-    /**
-     * Concatenate a number of streams.
-     * <p>
-     * <code><pre>
-     * // (1, 2, 3, 4, 5, 6)
-     * Seq.of(1, 2, 3).concat(Seq.of(4, 5, 6))
-     * </pre></code>
-     */
     @SafeVarargs
     static <T> Sequence<T> concat(Stream<T>... streams) {
         if (streams == null || streams.length == 0)
@@ -688,14 +627,6 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return sequence(result);
     }
 
-    /**
-     * Duplicate a Streams into two equivalent Streams.
-     * <p>
-     * <code><pre>
-     * // tuple((1, 2, 3), (1, 2, 3))
-     * Seq.of(1, 2, 3).duplicate()
-     * </pre></code>
-     */
     static <T> Tuple2<Sequence<T>, Sequence<T>> duplicate(Stream<T> stream) {
         final LinkedList<T> gap = new LinkedList<>();
         final Iterator<T> it = stream.iterator();
@@ -730,16 +661,10 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return tuple(sequence(new Duplicate()), sequence(new Duplicate()));
     }
 
-    /**
-     * Consume a stream and concatenate all elements.
-     */
     static String toString(Stream<?> stream) {
         return toString(stream, "");
     }
 
-    /**
-     * Consume a stream and concatenate all elements using a separator.
-     */
     static String toString(Stream<?> stream, String separator) {
         return stream.map(Objects::toString).collect(Collectors.joining(separator));
     }
@@ -818,14 +743,6 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return skipUntil(stream, predicate.negate());
     }
 
-    /**
-     * Returns a stream with all elements skipped for which a predicate evaluates to <code>false</code>.
-     * <p>
-     * <code><pre>
-     * // (3, 4, 5)
-     * Seq.of(1, 2, 3, 4, 5).skipUntil(i -> i == 3)
-     * </pre></code>
-     */
     @SuppressWarnings("unchecked")
     static <T> Sequence<T> skipUntil(Stream<T> stream, Predicate<? super T> predicate) {
         final Iterator<T> it = stream.iterator();
@@ -868,38 +785,14 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return sequence(new SkipUntil());
     }
 
-    /**
-     * Returns a stream limited to n elements.
-     * <p>
-     * <code><pre>
-     * // (1, 2, 3)
-     * Seq.of(1, 2, 3, 4, 5, 6).limit(3)
-     * </pre></code>
-     */
     static <T> Sequence<T> limit(Stream<T> stream, long elements) {
         return sequence(stream.limit(elements));
     }
 
-    /**
-     * Returns a stream limited to all elements for which a predicate evaluates to <code>true</code>.
-     * <p>
-     * <code><pre>
-     * // (1, 2)
-     * Seq.of(1, 2, 3, 4, 5).limitWhile(i -> i < 3)
-     * </pre></code>
-     */
     static <T> Sequence<T> limitWhile(Stream<T> stream, Predicate<? super T> predicate) {
         return limitUntil(stream, predicate.negate());
     }
 
-    /**
-     * Returns a stream limited to all elements for which a predicate evaluates to <code>true</code>.
-     * <p>
-     * <code><pre>
-     * // (1, 2)
-     * Seq.of(1, 2, 3, 4, 5).limitUntil(i -> i == 3)
-     * </pre></code>
-     */
     @SuppressWarnings("unchecked")
     static <T> Sequence<T> limitUntil(Stream<T> stream, Predicate<? super T> predicate) {
         final Iterator<T> it = stream.iterator();
@@ -940,14 +833,6 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
         return sequence(new LimitUntil());
     }
 
-    /**
-     * Partition a stream into two given a predicate.
-     * <p>
-     * <code><pre>
-     * // tuple((1, 3, 5), (2, 4, 6))
-     * Seq.of(1, 2, 3, 4, 5, 6).partition(i -> i % 2 != 0)
-     * </pre></code>
-     */
     static <T> Tuple2<Sequence<T>, Sequence<T>> partition(Stream<T> stream, Predicate<? super T> predicate) {
         final Iterator<T> it = stream.iterator();
         final LinkedList<T> buffer1 = new LinkedList<>();
@@ -989,103 +874,42 @@ public interface Sequence<T> extends Stream<T>, Iterable<T> {
 
 
 
-    /**
-     * Split a stream at the head.
-     * <p>
-     * <code><pre>
-     * // tuple(1, (2, 3, 4, 5, 6))
-     * Seq.of(1, 2, 3, 4, 5, 6).splitHead(3)
-     * </pre></code>
-     */
     static <T> Tuple2<Optional<T>, Sequence<T>> splitAtHead(Stream<T> stream) {
         Iterator<T> it = stream.iterator();
         return tuple(it.hasNext() ? Optional.of(it.next()) : Optional.empty(), sequence(it));
     }
 
-    // Methods taken from LINQ
-    // -----------------------
-
-    /**
-     * Keep only those elements in a stream that are of a given type.
-     * <p>
-     * <code><pre>
-     * // (1, 2, 3)
-     * Seq.of(1, "a", 2, "b", 3).ofType(Integer.class)
-     * </pre></code>
-     */
     @SuppressWarnings("unchecked")
     static <T, U> Sequence<U> ofType(Stream<T> stream, Class<U> type) {
         return sequence(stream).filter(type::isInstance).map(t -> (U) t);
     }
 
-    /**
-     * Cast all elements in a stream to a given type, possibly throwing a {@link ClassCastException}.
-     * <p>
-     * <code><pre>
-     * // ClassCastException
-     * Seq.of(1, "a", 2, "b", 3).cast(Integer.class)
-     * </pre></code>
-     */
     static <T, U> Sequence<U> cast(Stream<T> stream, Class<U> type) {
         return sequence(stream).map(type::cast);
     }
 
-    // Shortcuts to Collectors
-    // -----------------------
-
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#groupingBy(Function)} collector.
-     */
     static <T, K> Map<K, List<T>> groupBy(Stream<T> stream, Function<? super T, ? extends K> classifier) {
         return sequence(stream).groupBy(classifier);
     }
-
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#groupingBy(Function, Collector)} collector.
-     */
     static <T, K, A, D> Map<K, D> groupBy(Stream<T> stream, Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream) {
         return sequence(stream).groupBy(classifier, downstream);
     }
-
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#groupingBy(Function, Supplier, Collector)} collector.
-     */
     static <T, K, D, A, M extends Map<K, D>> M groupBy(Stream<T> stream, Function<? super T, ? extends K> classifier, Supplier<M> mapFactory, Collector<? super T, A, D> downstream) {
         return sequence(stream).groupBy(classifier, mapFactory, downstream);
     }
 
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#joining()}
-     * collector.
-     */
     static String join(Stream<?> stream) {
         return sequence(stream).join();
     }
 
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#joining(CharSequence)}
-     * collector.
-     */
     static String join(Stream<?> stream, CharSequence delimiter) {
         return sequence(stream).join(delimiter);
     }
 
-    /**
-     * Shortcut for calling {@link Stream#collect(Collector)} with a
-     * {@link Collectors#joining(CharSequence, CharSequence, CharSequence)}
-     * collector.
-     */
     static String join(Stream<?> stream, CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
         return sequence(stream).join(delimiter, prefix, suffix);
     }
 
-    // Covariant overriding of Stream return types
-    // -------------------------------------------
 
     @Override
     Sequence<T> filter(Predicate<? super T> predicate);
