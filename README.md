@@ -39,6 +39,12 @@ Generally, Exceptions are not suitable for functional programming. So you can us
         return Try.of(() -> "this should be returned");
     }
     
+    Try<String> tr = failure();
+    Try<String> tr1 = ok();
+    String result = tr.orElse("hello");
+    Assert.assertTrue(result.equals("hello"));
+    Assert.assertTrue(tr1.get().equals("this should be returned"));
+    
 ```
 
 
