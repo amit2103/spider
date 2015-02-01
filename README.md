@@ -32,8 +32,13 @@ Sequence.of(1, 2, 3).zip(Sequence.of("amit", "babi", "arav"))
 
 ```
 
-to unfold a function into a stream, use the code below:- 
+To unfold a function into a stream, use the code below:- 
+```java
+  Sequence seq3 = Sequence.unfold(20, i -> i >= 6 ? Optional.of(Tuple.tuple(i, i - 1)) : Optional.empty());
+  seq3.forEach(i -> System.out.println(i));
+  //this prints 20191817161514131211109876 (sorry for no spaces)
 
+```
 
 Generally, Exceptions are not suitable for functional programming. So you can use the Either class. You can also use the Try structure (this is heaviliy inspired by the Scala Try structure) to help in these kinds of scnerios. The Java code below gives an idea about how to use Try structure :-
 
