@@ -3,7 +3,9 @@
 Spider is a helper library for Java 8 designed to help with functional programming.
 Spider provides the <b>Sequence</b> class which enhances the Stream class with various utility functionas like
 join,foldLeft, foldRight etc.
-<code>
+
+
+```java
         org.spider.lambda.Sequence<Integer> seq = org.spider.lambda.Sequence.of(1, 2, 3, 4, 4);
         List<Integer> list = seq.distinct().collect(Collectors.toList());
         Assert.assertTrue(list.size() == 4);
@@ -14,4 +16,4 @@ join,foldLeft, foldRight etc.
         Assert.assertTrue(list.contains(5));
         
 
-/<code>
+```
