@@ -24,3 +24,25 @@ If you want to use foldLeft or foldRight you might want to use :-
         System.out.println(name);
         Assert.assertTrue(name.equals("Amit"));
 ```
+
+Generally, Exceptions are not suitable for functional programming. So you can use the Either class. You can also use the Try structure (this is heaviliy inspired by the Scala Try structure) to help in these kinds of scnerios. The Java code below gives an idea about how to use Try structure :-
+
+```java
+        //when called this method might produce failue (in this case always produces failue :) )
+        private Try<String> failure() {
+        return Try.of(() -> {
+            throw new RuntimeException();
+        });
+    }
+    //this will always return a success.
+    private Try<String> ok() {
+        return Try.of(() -> "this should be returned");
+    }
+    
+```
+
+
+
+
+
+
