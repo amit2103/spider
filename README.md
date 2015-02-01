@@ -24,6 +24,16 @@ If you want to use foldLeft or foldRight you might want to use :-
         System.out.println(name);
         Assert.assertTrue(name.equals("Amit"));
 ```
+Lets suppose you need to Zip two streasm into one. The JDK Streams Api does not provide anything for it. You can however use the Spider Sequence.zip method for it. The code below provides an example :- 
+
+```java
+Sequence.of(1, 2, 3).zip(Sequence.of("amit", "babi", "arav")) 
+//produces  (tuple(1, "amit"), tuple(2, "babi"), tuple(3, "arav"))
+
+```
+
+to unfold a function into a stream, use the code below:- 
+
 
 Generally, Exceptions are not suitable for functional programming. So you can use the Either class. You can also use the Try structure (this is heaviliy inspired by the Scala Try structure) to help in these kinds of scnerios. The Java code below gives an idea about how to use Try structure :-
 
