@@ -40,7 +40,7 @@ To unfold a function into a stream, use the code below:-
 
 ```
 
-Generally, Exceptions are not suitable for functional programming. So you can use the Either class. You can also use the Try structure (this is heaviliy inspired by the Scala Try structure) to help in these kinds of scnerios. The Java code below gives an idea about how to use Try structure :-
+Generally, Exceptions are not suitable for functional programming. So you can use the Either class. You can also use the Try structure (this is heaviliy inspired by the Scala Try ) to help in these kinds of scnerios. The Java code below gives an idea about how to use Try structure :-
 
 ```java
         //when called this method might produce failue (in this case always produces failue :) )
